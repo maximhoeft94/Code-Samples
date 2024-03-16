@@ -1,0 +1,62 @@
+##### A/B Testing #####
+### Import Packages as Needed ###
+import numpy as np
+import pandas as pd
+from scipy.stats import ttest_ind
+import matplotlib.pyplot as plt
+
+
+### Create Dummy Data for the Test ###
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Generate dummy data for control group (Version A)
+control_group = np.random.binomial(n=1, p=0.1, size=1000)  # Conversion rate of 10%
+
+# Generate dummy data for treatment group (Version B)
+treatment_group = np.random.binomial(n=1, p=0.12, size=1000)  # Conversion rate of 12%
+
+# Combine data into a DataFrame
+data = pd.DataFrame({'Control': control_group, 'Treatment': treatment_group})
+
+
+### Perform EDA ###
+# Calculate conversion rates
+conversion_rate_control = data['Control'].mean()
+conversion_rate_treatment = data['Treatment'].mean()
+
+# Plot bar chart for conversion rates
+plt.figure(figsize=(8, 6))
+plt.bar(['Control (Version A)', 'Treatment (Version B)'], [conversion_rate_control, conversion_rate_treatment], color=['blue', 'green'])
+plt.ylabel('Conversion Rate')
+plt.title('Conversion Rates for Control and Treatment Groups')
+plt.ylim(0, 0.2)  # Adjust ylim to match the range of conversion rates
+plt.show()
+
+# Plot histogram for control group
+plt.figure(figsize=(8, 6))
+plt.hist(data['Control'], color='blue', alpha=0.5, label='Control (Version A)')
+plt.hist(data['Treatment'], color='green', alpha=0.5, label='Treatment (Version B)')
+plt.xlabel('Conversion Outcome')
+plt.ylabel('Frequency')
+plt.title('Distribution of Conversion Outcomes for Control and Treatment Groups')
+plt.legend()
+plt.show()
+
+
+### Perform the Test ###
+# Perform two-sample independent t-test
+t_stat, p_value = ttest_ind(data['Treatment'], data['Control'])
+
+# Define significance level (alpha)
+alpha = 0.05
+
+# Print the results
+print("t-statistic:", t_stat)
+print("p-value:", p_value)
+
+if p_value < alpha:
+    print("Reject the null hypothesis. There is a statistically significant difference between the groups.")
+else:
+    print("Fail to reject the null hypothesis. There is no statistically significant difference between the groups.")
+
