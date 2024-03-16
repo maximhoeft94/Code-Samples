@@ -1,0 +1,163 @@
+##### Simple Linear Regression Demo #####
+### Import Libraries ###
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import statsmodels.api as sm
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+from scipy import stats
+from scipy.stats import kurtosis, skew
+import seaborn as sns
+import math
+
+
+### Create Dummy Data ###
+# Create Values #
+promotion_ad = [21300, 23400, 53000, 57000, 14000, 23000, 42000, 32100, 11000, 36500, 18000, 33500, 48500, 46000, 15000, 29500, 30500, 27000, 39000, 61000, 35000, 32100, 38000, 47750, 45000, 35005, 57500, 62500, 42500, 45000, 55000, 41050, 39000, 49000, 52000, 14000, 16500, 26700, 28500, 23000, 21000, 41000, 42000, 13500, 15000, 26000, 29000, 37500, 32000, 19500, 20500, 25000, 42000, 39000, 40000, 27000, 32000, 31000, 22000, 21000, 34000, 37000, 27000, 31000, 21000, 52000, 49000, 47000, 51000, 62000, 58000, 56000, 49000, 53000]
+promotion_rev = [3242432, 4232123, 5435123, 4323857, 600123, 750000, 4103234, 2202432, 4320534, 2303432, 1350324, 2250430, 4253049, 3102543, 3423757, 2343545, 2703234, 2104876, 4203432, 140123, 5102342, 4230423, 3712432, 3902423, 4203548, 3900223, 1342523, 5502234, 2103523, 2603523, 2343126, 2033530, 1502425, 1302426, 1050234, 1430756, 1750123, 2902932, 3210342, 1902023, 1602010, 3214232, 5200002, 1000010, 1200201, 1890022, 2000000, 3400001, 3100000, 2101232, 1912387, 2229664, 3851404, 3331311, 3551598, 2500014, 2900423, 3200156, 2132412, 3210212, 3400123, 2812315, 2500012, 5200012, 2412315, 1402312, 1203242, 1802315, 2001312, 110212, 123234, 90010, 90210, 100232]
+promotion_type = ['B', 'B', 'B', 'B', 'A', 'B', 'A', 'A', 'B', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'A', 'A', 'A', 'B', 'A', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A','A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B']
+
+# Data Frame #
+df = pd.DataFrame({'Promotion Ad Cost':promotion_ad,
+                   'Promotion Rev':promotion_rev,
+                   'Promotion Type':promotion_type})
+                  
+print(df.head())
+
+
+### EDA ###
+## View Scatterplot ##
+# Combined #
+x = df['Promotion Ad Cost']
+y = df['Promotion Rev']
+
+plt.plot(x, y, 'o', label = 'Legend', data = df)
+plt.title('Cost vs. Revenue')
+plt.xlabel('Promotion Ad Cost')
+plt.ylabel('Promotion Revenue')
+plt.show()
+
+# Type A #
+df_A = df[df['Promotion Type'] == 'A']
+x = df_A['Promotion Ad Cost']
+y = df_A['Promotion Rev']
+
+plt.plot(x, y, 'o', color = 'cadetblue', label = 'Legend', data = df_A)
+plt.title('Cost vs. Revenue (Type A)') 
+plt.xlabel('Promotion Ad Cost')
+plt.ylabel('Promotion Revenue')
+plt.show()
+
+# Type B #
+df_B = df[df['Promotion Type'] == 'B']
+x = df_B['Promotion Ad Cost']
+y = df_B['Promotion Rev']
+
+plt.plot(x, y, 'o', color = 'cadetblue', label = 'Legend', data = df_B)
+plt.title('Cost vs. Revenue (Type B)') 
+plt.xlabel('Promotion Ad Cost')
+plt.ylabel('Promotion Revenue')
+plt.show()
+
+## Basic Stats ##
+print(df_A.describe())
+print('')
+
+## Correlation Heatmap ##
+corrmat = df_A.corr()
+hm = sns.heatmap(corrmat, 
+                 cbar = True, 
+                 annot = True, 
+                 square = True, 
+                 fmt = '.2f', 
+                 annot_kws = {'size': 10}, 
+                 yticklabels = df.columns, 
+                 xticklabels = df.columns, 
+                 cmap = "Spectral_r")
+plt.show()
+
+## Histogram ##
+plt.hist(df_A["Promotion Ad Cost"], density = True, bins = 30)
+plt.title('Advertisement Cost Distribution') 
+plt.xlabel('Promotion Ad Cost')
+plt.ylabel('Frequency')
+plt.show()
+df_A.hist(column = 'Promotion Ad Cost')
+print(f"Skewness: {df['Promotion Ad Cost'].skew()}")
+print(f"Kurtosis: {df['Promotion Ad Cost'].kurt()}")
+print('')
+
+
+### Building the Model ###
+y = df_A[['Promotion Rev']]
+x = df_A[['Promotion Ad Cost']]
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.25, random_state = 1)
+
+regression_model = LinearRegression()
+regression_model.fit(x_train, y_train)
+
+## Explore the Output ##
+intercept = regression_model.intercept_[0]
+coefficient = regression_model.coef_[0][0]
+print("The coefficient of our model is {:.2}".format(coefficient))
+print('')
+print("The intercept of our model is {:.2}".format(intercept))
+print('')
+
+## Make a Single Prediciton ##
+pred = regression_model.predict([[25000]])
+pred_value = pred[0][0]
+print("The predicted value is {:.4}".format(pred_value))
+print('')
+
+## Make Multiple Predictions ##
+y_pred = regression_model.predict(x_test)
+
+model_input = x_test.values.tolist()
+model_output = y_pred.tolist()
+
+
+for x, y in zip(model_input, model_output):
+    print("The input of $", *x, "will return a prediction value of $", round(*y, 2))
+
+print('')
+
+
+### Evaluating the Model ###
+x2 = sm.add_constant(x)
+model = sm.OLS(y, x2)
+est = model.fit()
+
+## Error Values ##
+# Mean Squared Error #
+model_mse = mean_squared_error(y_test, y_pred)
+print("MSE: {:.3}".format(model_mse))
+print('')
+
+# Mean Absolute Error #
+model_mae = mean_absolute_error(y_test, y_pred)
+print("MAE: {:.3}".format(model_mae))
+print('')
+
+# Root Mean Squared Error #
+model_rmse = math.sqrt(model_mse)
+print("RMSE: {:.3}".format(model_rmse))
+print('')
+
+## R-Sqaured ##
+model_r2 = r2_score(y_test, y_pred)
+print("R2: {:.2}".format(model_r2))
+
+## Plot Residuals ##
+(y_test - y_pred).hist(grid = False, color = 'royalblue')
+plt.title("Model Residuals")
+plt.show()
+
+
+### Plot the Regression Line ###
+plt.scatter(x_test, y_test, color = 'gainsboro', label = 'Promotion Ad Cost')
+plt.plot(x_test, y_pred, color = 'royalblue', linewidth = 3, linestyle = '-', label = 'Regression Line')
+plt.show()
