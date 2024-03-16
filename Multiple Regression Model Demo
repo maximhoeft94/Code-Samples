@@ -1,0 +1,60 @@
+##### Multiple Linear Regression Demo #####
+### Import Libraries ###
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+
+### Create Dummy Data ###
+np.random.seed(0)
+X1 = np.random.rand(100) * 10  # Feature 1
+X2 = np.random.rand(100) * 5   # Feature 2
+X3 = np.random.rand(100) * 3   # Feature 3
+y = 2*X1 + 3*X2 - 4*X3 + np.random.randn(100) * 2
+
+
+### Create Dataframe ###
+data = pd.DataFrame({'Feature1': X1, 'Feature2': X2, 'Feature3': X3, 'Target': y})
+
+
+### Visualize the Data ###
+import seaborn as sns
+sns.pairplot(data)
+plt.show()
+
+### Perform the Regression ###
+# Split the data into train and test sets
+X = data[['Feature1', 'Feature2', 'Feature3']]
+y = data['Target']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initialize the Linear Regression model
+model = LinearRegression()
+
+# Fit the model on the training data
+model.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred = model.predict(X_test)
+
+# Calculate mean squared error and R-squared
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print("Mean Squared Error:", mse)
+print("R-squared:", r2)
+
+
+### Visualize the Prediction Model ###
+# Plot actual vs predicted values
+plt.figure(figsize=(8, 6))
+plt.scatter(y_test, y_pred, color='blue')
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2)
+plt.xlabel('Actual')
+plt.ylabel('Predicted')
+plt.title('Actual vs Predicted Values')
+plt.show()
+
