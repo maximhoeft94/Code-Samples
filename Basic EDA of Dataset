@@ -1,0 +1,130 @@
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from scipy.stats import ttest_ind
+
+# Create the dataset
+data = {
+    'Age': np.random.randint(18, 70, size=100),
+    'Gender': np.random.choice(['Male', 'Female'], size=100),
+    'Height': np.random.normal(loc=170, scale=10, size=100),
+    'Weight': np.random.normal(loc=70, scale=15, size=100),
+    'Income': np.random.randint(20000, 100000, size=100)
+}
+
+# Convert the dictionary to a DataFrame
+df = pd.DataFrame(data)
+
+# Clean the data of anomalies
+# Assuming no specific anomalies to clean in this example
+
+# Clean the data of duplicates
+df.drop_duplicates(inplace=True)
+
+# Create barplots for each variable
+plt.figure(figsize=(15, 10))
+
+# Barplot for Age
+plt.subplot(2, 3, 1)
+sns.histplot(df['Age'], bins=10)
+plt.title('Age Distribution')
+
+# Barplot for Gender
+plt.subplot(2, 3, 2)
+sns.countplot(x='Gender', data=df)
+plt.title('Gender Distribution')
+
+# Barplot for Height
+plt.subplot(2, 3, 3)
+sns.histplot(df['Height'], bins=10)
+plt.title('Height Distribution')
+
+# Barplot for Weight
+plt.subplot(2, 3, 4)
+sns.histplot(df['Weight'], bins=10)
+plt.title('Weight Distribution')
+
+# Barplot for Income
+plt.subplot(2, 3, 5)
+sns.histplot(df['Income'], bins=10)
+plt.title('Income Distribution')
+
+plt.tight_layout()
+plt.show()
+
+# Create a correlation heatmap
+plt.figure(figsize=(8, 6))
+sns.heatmap(df.corr(), annot=True, cmap='coolwarm', fmt=".2f")
+plt.title('Correlation Heatmap')
+plt.show()
+
+# Separate the data by gender
+df_male = df[df['Gender'] == 'Male']
+df_female = df[df['Gender'] == 'Female']
+
+# Repeat the analysis for each gender
+# Barplots for each variable by gender
+plt.figure(figsize=(15, 10))
+
+# Barplot for Age by Gender
+plt.subplot(2, 3, 1)
+sns.histplot(df_male['Age'], bins=10, color='blue', alpha=0.5, label='Male')
+sns.histplot(df_female['Age'], bins=10, color='pink', alpha=0.5, label='Female')
+plt.title('Age Distribution by Gender')
+plt.legend()
+
+# Barplot for Height by Gender
+plt.subplot(2, 3, 2)
+sns.histplot(df_male['Height'], bins=10, color='blue', alpha=0.5, label='Male')
+sns.histplot(df_female['Height'], bins=10, color='pink', alpha=0.5, label='Female')
+plt.title('Height Distribution by Gender')
+plt.legend()
+
+# Barplot for Weight by Gender
+plt.subplot(2, 3, 3)
+sns.histplot(df_male['Weight'], bins=10, color='blue', alpha=0.5, label='Male')
+sns.histplot(df_female['Weight'], bins=10, color='pink', alpha=0.5, label='Female')
+plt.title('Weight Distribution by Gender')
+plt.legend()
+
+# Barplot for Income by Gender
+plt.subplot(2, 3, 4)
+sns.histplot(df_male['Income'], bins=10, color='blue', alpha=0.5, label='Male')
+sns.histplot(df_female['Income'], bins=10, color='pink', alpha=0.5, label='Female')
+plt.title('Income Distribution by Gender')
+plt.legend()
+
+plt.tight_layout()
+plt.show()
+
+# Correlation heatmap by gender
+plt.figure(figsize=(15, 6))
+
+plt.subplot(1, 2, 1)
+sns.heatmap(df_male.corr(), annot=True, cmap='coolwarm', fmt=".2f")
+plt.title('Correlation Heatmap - Male')
+
+plt.subplot(1, 2, 2)
+sns.heatmap(df_female.corr(), annot=True, cmap='coolwarm', fmt=".2f")
+plt.title('Correlation Heatmap - Female')
+
+plt.tight_layout()
+plt.show()
+
+# Boxplot for Age by Gender
+plt.figure(figsize=(8, 6))
+sns.boxplot(x='Gender', y='Age', data=df)
+plt.title('Age Distribution by Gender')
+plt.show()
+
+# Scatterplot for Height and Weight
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x='Height', y='Weight', data=df)
+plt.title('Height vs Weight')
+plt.show()
+
+# Pairplot for all numerical variables
+sns.pairplot(df)
+plt.suptitle('Pairplot of Numerical Variables', y=1.02)
+plt.show()
