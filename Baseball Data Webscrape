@@ -1,0 +1,82 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import matplotlib
+from matplotlib import pyplot as plt
+
+# Base URL for the data
+base_url = "https://www.baseball-reference.com/leagues/majors/{year}.shtml#all_teams_standard_batting"
+
+# Function to scrape data for a given year
+def scrape_data(year):
+    # URL of the page containing the data table
+    url = base_url.format(year=year)
+
+    # Send a GET request to the URL
+    response = requests.get(url)
+
+    # Parse HTML content
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    # Find the table containing the data
+    table = soup.find('table', {'id': 'teams_standard_batting'})
+
+    # Extract table headers
+    headers = [th.text.strip() for th in table.find('thead').findAll('th')]
+
+    # Extract and combine headers with row data
+    data = []
+    for row in table.find('tbody').findAll('tr'):
+        row_data = [td.text.strip() for td in row.findAll('td')]
+        # Check if the row contains data (ignoring rows for division names)
+        if row_data and row_data[0].isdigit():
+            combined_data = dict(zip(headers, [row.find('th').text] + row_data))  # Include 'Tm' column
+            data.append(combined_data)
+
+    # Convert data to DataFrame
+    df = pd.DataFrame(data)
+
+    # Add a column for the year
+    df['Year'] = year
+
+    return df
+
+# Scrape data for the past 10 years
+dfs = []
+for year in range(2014, 2024):
+    print("Scraping data for year", year)
+    dfs.append(scrape_data(year))
+
+# Concatenate DataFrames for all years
+df = pd.concat(dfs, ignore_index=True)
+df = pd.DataFrame(df)
+
+# Print the combined DataFrame
+print(df)
+
+
+##################################################
+
+remove_year = 2020
+df = df[df['Year'] != remove_year] # Remove 2020 becauseo nly 60 games were played instead of 162
+
+df.columns
+def single_metric_yoy(name, y):
+    team_data = df[df['Tm'] == name]
+    x_value = team_data['Year']
+    y_value = team_data[y]
+    y_value = y_value.astype(int)
+    
+    plt.plot(x_value, y_value, color = 'orange', marker = '.', markersize = 10,label = name)
+    plt.title('Number of HRs in the Past 10 Seasons')
+    plt.xlabel('Year')
+    plt.ylabel('HRs')
+    plt.legend()
+    plt.show()
+
+## Example
+# Select a Team and a Metric
+single_metric_yoy('San Francisco Giants', 'HR')
+
+
+
