@@ -59,8 +59,8 @@ print(df)
 
 remove_year = 2020
 df = df[df['Year'] != remove_year] # Remove 2020 becauseo nly 60 games were played instead of 162
+df.columns # Metrics of Choice
 
-df.columns
 def single_metric_yoy(name, y):
     team_data = df[df['Tm'] == name]
     x_value = team_data['Year']
@@ -68,15 +68,34 @@ def single_metric_yoy(name, y):
     y_value = y_value.astype(int)
     
     plt.plot(x_value, y_value, color = 'orange', marker = '.', markersize = 10,label = name)
-    plt.title('Number of HRs in the Past 10 Seasons')
+    plt.title('Number of ' + y + ' for ' + name + ' in the Past 10 Seasons')
     plt.xlabel('Year')
-    plt.ylabel('HRs')
+    plt.ylabel(y)
     plt.legend()
+    plt.grid(True)
     plt.show()
 
-## Example
-# Select a Team and a Metric
 single_metric_yoy('San Francisco Giants', 'HR')
 
 
+
+def compare_teams(name_list, y):
+    plt.figure(figsize=(10, 6))  # Adjust the figure size if needed
+    
+    for name in name_list:
+        team_data = df[df['Tm'] == name]
+        x_value = team_data['Year']
+        y_value = team_data[y].astype(int)
+        
+        plt.plot(x_value, y_value, marker='.', markersize=10, label=name)
+    
+    plt.title('Comparison of ' + y + ' for Teams in the Past 10 Seasons')
+    plt.xlabel('Year')
+    plt.ylabel(y)
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+team_names = ['San Francisco Giants', 'Arizona Diamondbacks']  
+compare_teams(team_names, 'HR')  
 
