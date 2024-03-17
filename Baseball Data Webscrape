@@ -99,3 +99,26 @@ def compare_teams(name_list, y):
 team_names = ['San Francisco Giants', 'Arizona Diamondbacks']  
 compare_teams(team_names, 'HR')  
 
+
+
+def compare_teams_with_multiple_metrics(name_list, metrics):
+    plt.figure(figsize=(10, 6))  # Adjust the figure size if needed
+    
+    for name in name_list:
+        for metric in metrics:
+            team_data = df[df['Tm'] == name]
+            x_value = team_data['Year']
+            y_value = team_data[metric].astype(int)
+        
+            plt.plot(x_value, y_value, marker='.', markersize=10, label=name + ' - ' + metric)
+    
+    plt.title('Comparison of Metrics for Teams in the Past 10 Seasons')
+    plt.xlabel('Year')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+# Example usage:
+team_names = ['San Francisco Giants', 'Arizona Diamondbacks']  
+metrics_to_compare = ['HR', 'R', 'H']  
+compare_teams_with_multiple_metrics(team_names, metrics_to_compare)
