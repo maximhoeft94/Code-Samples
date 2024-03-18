@@ -1,0 +1,124 @@
+### Import Libraries
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import matplotlib
+from matplotlib import pyplot as plt
+
+### Obtain Data
+file_path = 'Desktop/Basketball Data.xlsx'
+df = pd.read_excel(file_path)
+df = pd.DataFrame(df)
+df.head()
+df.columns
+
+## 3 Point Graphic
+def plot_3pt_trend(data, teams):
+    plt.figure(figsize=(10, 6))
+    
+    # Iterate over each team
+    for team in teams:
+        # Filter the data for the specified team
+        team_data = data[data['Team'] == team]
+        
+        # Group the data by 'Season'
+        season_groups = team_data.groupby('Season')
+        
+        # Prepare data for plotting
+        seasons = []
+        three_point_percentages = []
+        for season, group in season_groups:
+            seasons.append(season)
+            three_point_percentages.append(group['3P%'].mean())  # Mean 3P% for the season
+        
+        # Plot the trend for the current team
+        plt.plot(seasons, three_point_percentages, marker='o', label=team)
+    
+    plt.xlabel('Season')
+    plt.ylabel('Average 3P%')
+    plt.title('Average 3P% Trend for Teams')
+    plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+teams_to_plot = ['Golden State Warriors', 'Denver Nuggets', 'Los Angeles Lakers']  # List of teams to plot
+plot_3pt_trend(df, teams_to_plot)
+
+
+## Any Metric Graphic
+def plot_metric_trend(data, teams, metric):
+    plt.figure(figsize=(10, 6))
+    
+    # Iterate over each team
+    for team in teams:
+        # Filter the data for the specified team
+        team_data = data[data['Team'] == team]
+        
+        # Group the data by 'Season'
+        season_groups = team_data.groupby('Season')
+        
+        # Prepare data for plotting
+        seasons = []
+        metric_values = []
+        for season, group in season_groups:
+            seasons.append(season)
+            metric_values.append(group[metric].mean())  # Mean value for the metric for the season
+        
+        # Plot the trend for the current team
+        plt.plot(seasons, metric_values, marker='o', label=team)
+    
+    plt.xlabel('Season')
+    plt.ylabel(f'Average {metric}')
+    plt.title(f'Average {metric} Trend for Teams')
+    plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+teams_to_plot = ['Golden State Warriors', 'Denver Nuggets', 'Los Angeles Lakers']  # List of teams to plot
+metric_to_plot = 'FG'  # Metric to plot (e.g., 'PTS' for points)
+plot_metric_trend(df, teams_to_plot, metric_to_plot)
+
+
+## Multiple Metrics/Teams
+def plot_metrics_trend(data, teams, metrics):
+    plt.figure(figsize=(10, 6))
+    
+    # Iterate over each metric
+    for metric in metrics:
+        # Iterate over each team
+        for team in teams:
+            # Filter the data for the specified team
+            team_data = data[data['Team'] == team]
+            
+            # Group the data by 'Season'
+            season_groups = team_data.groupby('Season')
+            
+            # Prepare data for plotting
+            seasons = []
+            metric_values = []
+            for season, group in season_groups:
+                seasons.append(season)
+                metric_values.append(group[metric].mean())  # Mean value for the metric for the season
+            
+            # Plot the trend for the current team and metric
+            plt.plot(seasons, metric_values, marker='o', label=f'{team} - {metric}')
+    
+    plt.xlabel('Season')
+    plt.ylabel('Average Metric Value')
+    plt.title('Average Metric Trend for Teams')
+    plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+# Example usage:
+# Assuming 'df' is your DataFrame containing the dataset
+# Replace 'df' with the name of your DataFrame if it's different
+teams_to_plot = ['Golden State Warriors', 'Denver Nuggets', 'Los Angeles Lakers']  # List of teams to plot
+metrics_to_plot = ['FG', '3P', 'FT']  # List of metrics to plot
+plot_metrics_trend(df, teams_to_plot, metrics_to_plot)
