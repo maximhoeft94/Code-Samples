@@ -1,0 +1,95 @@
+### Import Libraries
+import pandas as pd
+import matplotlib
+from matplotlib import pyplot as plt
+
+
+### Obtain Data
+file_path = 'Desktop/College Basketball Data.xlsx'
+df = pd.read_excel(file_path)
+df = pd.DataFrame(df)
+df.head()
+
+
+### Manipulate the Data
+df['Team PPG'] = df['Tm. Points'] / df['G']
+df['Opp PPG'] = df['Opp. Points'] / df['G']
+df['3P Rate'] = df['3PA'] / df['FGA']
+df['2P'] = df['FG'] - df['3P']
+df['2PA'] = df['FGA'] - df['3PA']
+df['2P Rate'] = df['2PA'] / df['FGA']
+df['2P%'] = df['2P'] / df['2PA']
+df['AST/TOV'] = df['AST'] / df['TOV']
+df['DRB'] = df['TRB'] - df['ORB']
+
+# Reorganize the Columns
+new_column_order = ['School', 'G', 'W', 'L', 'W-L%', 'Conf W.', 'Conf. L', 'Tm. Points', 'Opp. Points', 'FG', 'FGA', 'FG%',
+                    '3P', '3PA', '3P Rate', '3P%', '2P', '2PA', '2P Rate', '2P%', 'FT', 'FTA', 'FT%', 'ORB', 'DRB', 'TRB',
+                    'AST', 'TOV', 'AST/TOV', 'STL', 'BLK', 'PF']
+
+df = df.reindex(columns=new_column_order)
+df.columns
+
+
+### Scatterplot of 3pt Rate vs 3pt %
+def scatter_plot_3ptrate_3ptper(df, schools):
+    # Create an empty DataFrame to store combined data for all schools
+    combined_data = pd.DataFrame()
+    
+    # Concatenate data for all specified schools
+    for school in schools:
+        school_data = df[df['School'] == school]
+        combined_data = pd.concat([combined_data, school_data])
+    
+    # Create scatter plot for each school
+    plt.figure(figsize=(8, 6))
+    for school in schools:
+        school_data = combined_data[combined_data['School'] == school]
+        plt.scatter(school_data['3P Rate'], school_data['3P%'], label=school, alpha=0.5)
+    
+    # Set plot labels and title
+    plt.xlabel('3P Rate')
+    plt.ylabel('3P%')
+    plt.title('Scatter Plot for Multiple Schools')
+    
+    # Show legend
+    plt.legend()
+    
+    # Show plot
+    plt.grid(True)
+    plt.show()
+
+multiple_schools = ['Gonzaga', 'Brigham Young', 'Kansas', 'Purdue', 'Connecticut', 'Houston']
+scatter_plot_3ptrate_3ptper(df, multiple_schools)
+
+
+### Scatterplot to compare any school(s) with any metrics
+def any_schools_any_metrics(df, schools, metric1, metric2):
+    # Create an empty DataFrame to store combined data for all schools
+    combined_data = pd.DataFrame()
+    
+    # Concatenate data for all specified schools
+    for school in schools:
+        school_data = df[df['School'] == school]
+        combined_data = pd.concat([combined_data, school_data])
+    
+    # Create scatter plot for each school
+    plt.figure(figsize=(8, 6))
+    for school in schools:
+        school_data = combined_data[combined_data['School'] == school]
+        plt.scatter(school_data[metric1], school_data[metric2], label=school, alpha=0.5)
+    
+    # Set plot labels and title
+    plt.xlabel(metric1)
+    plt.ylabel(metric2)
+    plt.title('Custom Scatter Plot for Multiple Schools')
+    
+    # Show legend
+    plt.legend()
+    
+    # Show plot
+    plt.grid(True)
+    plt.show()
+    
+multiple_schools = ['Gonzaga', 'Brigham Young', 'Kansas', 'Purdue', 'Connecticut', 'Houston']
+any_schools_any_metrics(df, multiple_schools, '2P Rate', '2P%')
